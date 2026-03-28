@@ -8,7 +8,7 @@ def _stringify(value):
 def serialize_token(doc: dict) -> dict:
 	return {
 		"id": _stringify(doc.get("_id")),
-		"dataset_id": doc.get("dataset_id"),
+		"project_id": doc.get("project_id"),
 		"sentence_id": doc.get("sentence_id"),
 		"sentence_index": doc.get("sentence_index"),
 		"position": doc.get("position"),
@@ -34,7 +34,7 @@ def serialize_pattern(doc: dict) -> dict:
 	new_tag = suggested[1] if len(suggested) > 1 else None
 	return {
 		"id": _stringify(doc.get("_id")),
-		"dataset_id": doc.get("dataset_id"),
+		"project_id": doc.get("project_id"),
 		"sentence_id": doc.get("sentence_id"),
 		"left_position": doc.get("left_position"),
 		"sequence": doc.get("sequence", []),

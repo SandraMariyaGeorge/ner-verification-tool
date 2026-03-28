@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
-from app.core.settings import settings
 from app.schemas.pattern_schema import PatternFixRequest
 from app.services.pattern_service import apply_pattern_fix, detect_patterns
 
@@ -9,8 +8,8 @@ router = APIRouter(tags=["patterns"])
 
 
 @router.get("/patterns/errors")
-def patterns_errors() -> dict:
-	items = detect_patterns(dataset_id=settings.default_dataset_id)
+def patterns_errors(project_id: str = Query(..., min_length=1)) -> dict:
+	items = detect_patterns(project_id=project_id)
 	return {"items": items, "count": len(items)}
 
 
@@ -22,6 +21,7 @@ def patterns_fix(payload: PatternFixRequest) -> dict:
 	result = apply_pattern_fix(
 		target_token_id=payload.target_token_id,
 		new_tag=payload.new_tag,
+		project_id=payload.project_id,
 		pattern_id=payload.id,
 	)
 

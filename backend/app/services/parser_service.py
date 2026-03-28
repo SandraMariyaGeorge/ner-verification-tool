@@ -4,10 +4,10 @@ from app.config.db import patterns_col, sentences_col, tokens_col
 from app.utils.bio_validator import split_tag
 
 
-def parse_and_store(lines: Iterable[str], dataset_id: str) -> dict:
-	tokens_col.delete_many({"dataset_id": dataset_id})
-	sentences_col.delete_many({"dataset_id": dataset_id})
-	patterns_col.delete_many({"dataset_id": dataset_id})
+def parse_and_store(lines: Iterable[str], project_id: str) -> dict:
+	tokens_col.delete_many({"project_id": project_id})
+	sentences_col.delete_many({"project_id": project_id})
+	patterns_col.delete_many({"project_id": project_id})
 
 	token_docs: list[dict] = []
 	sentence_docs: list[dict] = []
@@ -22,11 +22,11 @@ def parse_and_store(lines: Iterable[str], dataset_id: str) -> dict:
 		if not sentence_words:
 			return
 
-		sentence_id = f"sent_{sentence_index}"
+		sentence_id = f"{project_id}_sent_{sentence_index}"
 		sentence_docs.append(
 			{
 				"_id": sentence_id,
-				"dataset_id": dataset_id,
+				"project_id": project_id,
 				"sentence_index": sentence_index,
 				"text": " ".join(sentence_words),
 			}
@@ -49,11 +49,11 @@ def parse_and_store(lines: Iterable[str], dataset_id: str) -> dict:
 
 		word, tag = parts
 		prefix, entity = split_tag(tag)
-		sentence_id = f"sent_{sentence_index}"
+		sentence_id = f"{project_id}_sent_{sentence_index}"
 
 		token_docs.append(
 			{
-				"dataset_id": dataset_id,
+				"project_id": project_id,
 				"sentence_id": sentence_id,
 				"sentence_index": sentence_index,
 				"position": position,
@@ -77,7 +77,7 @@ def parse_and_store(lines: Iterable[str], dataset_id: str) -> dict:
 		sentences_col.insert_many(sentence_docs)
 
 	return {
-		"dataset_id": dataset_id,
+		"project_id": project_id,
 		"token_count": len(token_docs),
 		"sentence_count": len(sentence_docs),
 		"skipped_lines": skipped_lines,

@@ -4,12 +4,12 @@ from app.utils.bio_validator import split_tag
 from app.utils.helpers import serialize_token
 
 
-def get_entity_occurrences(word: str, dataset_id: str) -> list[dict]:
+def get_entity_occurrences(word: str, project_id: str) -> list[dict]:
 	docs = tokens_col.find(
-		{"dataset_id": dataset_id, "word": word},
+		{"project_id": project_id, "word": word},
 		{
 			"_id": 1,
-			"dataset_id": 1,
+			"project_id": 1,
 			"sentence_id": 1,
 			"sentence_index": 1,
 			"position": 1,
@@ -25,16 +25,16 @@ def get_entity_occurrences(word: str, dataset_id: str) -> list[dict]:
 	items = []
 	for doc in docs:
 		token = serialize_token(doc)
-		token["context"] = _context_for_token(token["sentence_id"], token["position"])
+		token["context"] = _context_for_token(project_id=project_id, sentence_id=token["sentence_id"], position=token["position"])
 		items.append(token)
 	return items
 
 
-def bulk_update(word: str, new_tag: str, dataset_id: str) -> dict:
+def bulk_update(word: str, new_tag: str, project_id: str) -> dict:
 	prefix, entity = split_tag(new_tag)
 
 	result = tokens_col.update_many(
-		{"dataset_id": dataset_id, "word": word},
+		{"project_id": project_id, "word": word},
 		{
 			"$set": {
 				"tag": new_tag,

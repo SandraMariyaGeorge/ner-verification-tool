@@ -1,17 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from fastapi.responses import Response
 
 from app.config.db import tokens_col
-from app.core.settings import settings
 
 
 router = APIRouter(tags=["export"])
 
 
 @router.get("/export")
-def export_dataset() -> Response:
+def export_dataset(project_id: str = Query(..., min_length=1)) -> Response:
     docs = tokens_col.find(
-        {"dataset_id": settings.default_dataset_id},
+        {"project_id": project_id},
         {"word": 1, "tag": 1, "sentence_id": 1, "sentence_index": 1, "position": 1},
     ).sort([("sentence_index", 1), ("position", 1)])
 

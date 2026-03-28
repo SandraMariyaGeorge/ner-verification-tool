@@ -1,7 +1,10 @@
 ﻿import { backendUrl } from "../../../lib/proxy";
 
-export async function GET() {
-  const res = await fetch(backendUrl("/export"), {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const projectId = searchParams.get("project_id") || "";
+
+  const res = await fetch(backendUrl(`/export?project_id=${encodeURIComponent(projectId)}`), {
     method: "GET",
     cache: "no-store"
   });

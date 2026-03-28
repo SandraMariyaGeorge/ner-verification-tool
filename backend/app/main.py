@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.db import ensure_indexes
 from app.core.settings import settings
+from app.routes.auth_routes import router as auth_router
 from app.routes.entity_routes import router as entity_router
 from app.routes.export_routes import router as export_router
 from app.routes.pattern_routes import router as pattern_router
+from app.routes.project_routes import router as project_router
 from app.routes.sampling_routes import router as sampling_router
 from app.routes.upload_routes import router as upload_router
 
@@ -49,3 +51,5 @@ app.include_router(sampling_router)
 app.include_router(entity_router)
 app.include_router(pattern_router)
 app.include_router(export_router)
+app.include_router(auth_router)
+app.include_router(project_router)

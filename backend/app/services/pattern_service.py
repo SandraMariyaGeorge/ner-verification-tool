@@ -5,17 +5,17 @@ from app.utils.bio_validator import detect_invalid_transition, split_tag
 from app.utils.helpers import serialize_pattern
 
 
-def detect_patterns(dataset_id: str) -> list[dict]:
-	patterns_col.delete_many({"dataset_id": dataset_id})
+def detect_patterns(project_id: str) -> list[dict]:
+	patterns_col.delete_many({"project_id": project_id})
 
-	sentence_docs = sentences_col.find({"dataset_id": dataset_id}, {"_id": 1}).sort("sentence_index", 1)
+	sentence_docs = sentences_col.find({"project_id": project_id}, {"_id": 1}).sort("sentence_index", 1)
 	detected: list[dict] = []
 
 	for sentence in sentence_docs:
 		sid = sentence["_id"]
 		tokens = list(
 			tokens_col.find(
-				{"dataset_id": dataset_id, "sentence_id": sid},
+				{"project_id": project_id, "sentence_id": sid},
 				{"_id": 1, "word": 1, "tag": 1, "position": 1},
 			).sort("position", 1)
 		)
@@ -29,7 +29,7 @@ def detect_patterns(dataset_id: str) -> list[dict]:
 				continue
 
 			pattern_doc = {
-				"dataset_id": dataset_id,
+				"project_id": project_id,
 				"sentence_id": sid,
 				"left_position": left["position"],
 				"left_token_id": left["_id"],
@@ -47,11 +47,11 @@ def detect_patterns(dataset_id: str) -> list[dict]:
 	return detected
 
 
-def apply_pattern_fix(target_token_id: str, new_tag: str, pattern_id: str | None = None) -> dict:
+def apply_pattern_fix(target_token_id: str, new_tag: str, project_id: str, pattern_id: str | None = None) -> dict:
 	prefix, entity = split_tag(new_tag)
 
 	result = tokens_col.update_one(
-		{"_id": ObjectId(target_token_id)},
+		{"_id": ObjectId(target_token_id), "project_id": project_id},
 		{
 			"$set": {
 				"tag": new_tag,
@@ -63,6 +63,6 @@ def apply_pattern_fix(target_token_id: str, new_tag: str, pattern_id: str | None
 	)
 
 	if pattern_id:
-		patterns_col.update_one({"_id": ObjectId(pattern_id)}, {"$set": {"status": "resolved"}})
+		patterns_col.update_one({"_id": ObjectId(pattern_id), "project_id": project_id}, {"$set": {"status": "resolved"}})
 
 	return {"matched_count": result.matched_count, "modified_count": result.modified_count}

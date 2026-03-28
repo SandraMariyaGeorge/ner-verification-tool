@@ -4,9 +4,10 @@ from app.utils.constants import DEFAULT_CONTEXT_WINDOW
 from app.utils.helpers import serialize_context, serialize_token
 
 
-def _context_for_token(sentence_id: str, position: int, window: int = DEFAULT_CONTEXT_WINDOW) -> list[dict]:
+def _context_for_token(project_id: str, sentence_id: str, position: int, window: int = DEFAULT_CONTEXT_WINDOW) -> list[dict]:
 	docs = tokens_col.find(
 		{
+			"project_id": project_id,
 			"sentence_id": sentence_id,
 			"position": {"$gte": max(0, position - window), "$lte": position + window},
 		},
@@ -15,12 +16,12 @@ def _context_for_token(sentence_id: str, position: int, window: int = DEFAULT_CO
 	return [serialize_context(d) for d in docs]
 
 
-def get_preview(limit: int, dataset_id: str) -> list[dict]:
+def get_preview(limit: int, project_id: str) -> list[dict]:
 	docs = tokens_col.find(
-		{"dataset_id": dataset_id},
+		{"project_id": project_id},
 		{
 			"_id": 1,
-			"dataset_id": 1,
+			"project_id": 1,
 			"sentence_id": 1,
 			"sentence_index": 1,
 			"position": 1,
@@ -35,23 +36,23 @@ def get_preview(limit: int, dataset_id: str) -> list[dict]:
 	return [serialize_token(d) for d in docs]
 
 
-def get_sample(size: int, dataset_id: str) -> list[dict]:
-	sampled = list(tokens_col.aggregate([{"$match": {"dataset_id": dataset_id}}, {"$sample": {"size": size}}]))
+def get_sample(size: int, project_id: str) -> list[dict]:
+	sampled = list(tokens_col.aggregate([{"$match": {"project_id": project_id}}, {"$sample": {"size": size}}]))
 
 	items: list[dict] = []
 	for doc in sampled:
 		base = serialize_token(doc)
-		base["context"] = _context_for_token(base["sentence_id"], base["position"])
+		base["context"] = _context_for_token(project_id=project_id, sentence_id=base["sentence_id"], position=base["position"])
 		items.append(base)
 	return items
 
 
-def update_token_tag(sentence_id: str, position: int, new_tag: str, dataset_id: str) -> dict:
+def update_token_tag(sentence_id: str, position: int, new_tag: str, project_id: str) -> dict:
 	prefix, entity = split_tag(new_tag)
 
 	result = tokens_col.update_one(
 		{
-			"dataset_id": dataset_id,
+			"project_id": project_id,
 			"sentence_id": sentence_id,
 			"position": position,
 		},
