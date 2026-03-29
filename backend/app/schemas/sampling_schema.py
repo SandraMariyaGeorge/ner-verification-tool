@@ -23,3 +23,10 @@ class SampleFlagRequest(BaseModel):
 	project_id: str
 	verified_by: str | None = None
 	token_ids: list[str] = Field(default_factory=list)
+
+
+class PreviewVerifyRequest(BaseModel):
+	project_id: str
+	token_id: str
+	verified_by: str | None = None
+	new_tag: str | None = None

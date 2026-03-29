@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas.sampling_schema import SampleCorrectRequest, SampleFlagRequest, SampleWrongRequest
+from app.schemas.sampling_schema import PreviewVerifyRequest, SampleCorrectRequest, SampleFlagRequest, SampleWrongRequest
 from app.schemas.token_schema import TokenUpdateRequest
 from app.services.sampling_service import (
 	flag_sample,
@@ -9,6 +9,7 @@ from app.services.sampling_service import (
 	mark_sample_correct,
 	mark_sample_wrong,
 	update_token_tag,
+	verify_preview_token,
 )
 
 
@@ -71,3 +72,18 @@ def update_token(payload: TokenUpdateRequest) -> dict:
 		raise HTTPException(status_code=404, detail="Token not found")
 
 	return {"message": "Token updated", **result}
+
+
+@router.post("/preview/verify")
+def preview_verify(payload: PreviewVerifyRequest) -> dict:
+	result = verify_preview_token(
+		project_id=payload.project_id,
+		token_id=payload.token_id,
+		verified_by=payload.verified_by,
+		new_tag=payload.new_tag,
+	)
+
+	if result["matched_count"] == 0:
+		raise HTTPException(status_code=404, detail="Token not found")
+
+	return {"message": "Preview token verified", **result}

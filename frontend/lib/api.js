@@ -95,6 +95,21 @@ export async function updateSingleTag(token, newTag, projectId) {
   return parseResponse(res);
 }
 
+export async function verifyPreviewToken(token, newTag, projectId, verifiedBy = null) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/preview/verify", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      project_id: pid,
+      token_id: token.id,
+      verified_by: verifiedBy,
+      new_tag: newTag
+    })
+  });
+  return parseResponse(res);
+}
+
 export async function getEntityOccurrences(word, projectId) {
   const pid = withProjectId(projectId);
   const res = await fetch(`/api/entity?word=${encodeURIComponent(word)}&project_id=${encodeURIComponent(pid)}`);
@@ -123,6 +138,46 @@ export async function applyPatternFix(item, projectId) {
     method: "PUT",
     headers,
     body: JSON.stringify({ ...item, project_id: pid })
+  });
+  return parseResponse(res);
+}
+
+export async function detectSamplePatterns(context = [], projectId, sampleTokenId = null, editedTags = {}) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/patterns/detect", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ project_id: pid, sample_token_id: sampleTokenId, context, edited_tags: editedTags })
+  });
+  return parseResponse(res);
+}
+
+export async function findPatternMatches(pattern = [], projectId, limit = 5000, targetIndex = 1) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/patterns/match", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ project_id: pid, pattern, target_index: targetIndex, limit })
+  });
+  return parseResponse(res);
+}
+
+export async function applyPatternFixSelection(payload, projectId) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/patterns/apply", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...payload, project_id: pid })
+  });
+  return parseResponse(res);
+}
+
+export async function ignorePatternSuggestion(payload, projectId) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/patterns/ignore", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...payload, project_id: pid })
   });
   return parseResponse(res);
 }

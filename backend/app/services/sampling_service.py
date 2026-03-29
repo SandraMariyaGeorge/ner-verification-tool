@@ -317,3 +317,42 @@ def flag_sample(project_id: str, token_ids: list[str], verified_by: str | None =
 		"item": {"target": serialize_token(target_doc), "context": context},
 		"message": "Context expanded. Click Flag again to see more context.",
 	}
+
+
+def verify_preview_token(project_id: str, token_id: str, verified_by: str | None = None, new_tag: str | None = None) -> dict:
+	try:
+		parsed_id = ObjectId(token_id)
+	except Exception:
+		stats = sync_project_stats(project_id)
+		return {"matched_count": 0, "modified_count": 0, "stats": stats}
+
+	token = tokens_col.find_one({"project_id": project_id, "_id": parsed_id}, {"tag": 1})
+	if not token:
+		stats = sync_project_stats(project_id)
+		return {"matched_count": 0, "modified_count": 0, "stats": stats}
+
+	now = datetime.now(timezone.utc).isoformat()
+	set_fields = {
+		"verification_status": "verified",
+		"verified_by": verified_by,
+		"verified_at": now,
+	}
+
+	if new_tag and new_tag != token.get("tag"):
+		prefix, entity = split_tag(new_tag)
+		set_fields.update(
+			{
+				"tag": new_tag,
+				"tag_prefix": prefix,
+				"entity_type": entity,
+				"is_modified": True,
+			}
+		)
+
+	result = tokens_col.update_one(
+		{"project_id": project_id, "_id": parsed_id},
+		{"$set": set_fields},
+	)
+
+	stats = sync_project_stats(project_id)
+	return {"matched_count": result.matched_count, "modified_count": result.modified_count, "stats": stats}
