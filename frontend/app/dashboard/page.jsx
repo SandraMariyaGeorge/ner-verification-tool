@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProject, listProjects, uploadDataset } from "../../lib/api";
@@ -12,7 +11,7 @@ export default function DashboardPage() {
   const [name, setName] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("Create or open a project.");
+  const [, setStatus] = useState("Create or open a project.");
 
   const refreshProjects = async (userId) => {
     const data = await listProjects(userId);
@@ -88,17 +87,11 @@ export default function DashboardPage() {
               <div className="small">Tokens: {project.total_tokens || 0} | Sentences: {project.total_sentences || 0} | Status: {project.status}</div>
               <div className="controls-row" style={{ marginTop: 8 }}>
                 <button onClick={() => handleOpenProject(project.id)}>Open</button>
-                <Link href={`/project/${project.id}`}>Workspace</Link>
               </div>
             </div>
           ))}
           {!projects.length && <p className="small">No projects yet.</p>}
         </div>
-      </section>
-
-      <section className="card">
-        <h3>Status</h3>
-        <p>{status}</p>
       </section>
     </div>
   );

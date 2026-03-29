@@ -1,4 +1,11 @@
-﻿const TAGS = ["B-PER", "I-PER", "B-LOC", "I-LOC", "B-ORG", "I-ORG", "O"];
+﻿const TAGS = [
+  "B-PER", "I-PER",
+  "B-ORG", "I-ORG",
+  "B-LOC", "I-LOC",
+  "B-CARDINAL", "I-CARDINAL",
+  "B-ORDINAL", "I-ORDINAL",
+  "O"
+];
 
 export default function TagDropdown({ value, onChange }) {
   return (

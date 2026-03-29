@@ -1,106 +1,66 @@
-# Malayalam NER Verification Tool
+# Verification-Centric NER Annotation System
 
-This repository is scaffolded for a 3-phase NER dataset verification workflow.
+This project is a multi-user, project-based NER verification platform.
 
-## Functional Modules
+## Core Workflow
 
-1. Dataset Loading and Sampling
-- Load large NER datasets (10k+ words)
-- Preview parsed tokens
-- Random sampling by user-selected size
-- Show token context (previous/next words) with highlighted target token
-- Allow manual tag correction
+1. Signup/Login
+2. Create project and upload dataset
+3. Preview tokens with verification status
+4. Sample only unverified tokens
+5. Mark each sample as:
+- correct: mark verified
+- wrong: fix tag and mark verified
+- flagged: mark flagged for follow-up
+6. Track progress in real time
+7. Export final corrected dataset
 
-2. Entity-Based Bulk Correction
-- When one token tag is changed, fetch all matching entity surface forms across dataset
-- Review and apply bulk tag updates
+## Data Model Highlights
 
-3. Pattern Error Detection and Bulk Fix
-- Detect repeated BIO inconsistencies (example: `B-PER` followed by `B-LOC` where `I-PER` is expected)
-- List all pattern matches
-- Apply grouped fixes
+- users
+- projects
+- tokens
+- sentences
+- patterns
+- samples
 
-## Scaffolded Structure
+Token verification fields:
+- verification_status: unverified | verified | flagged
+- verified_by
+- verified_at
 
-```text
-ner-verification-tool/
-|-- backend/
-|   |-- app/
-|   |   |-- main.py
-|   |   |-- config/
-|   |   |   `-- db.py
-|   |   |-- models/
-|   |   |   |-- dataset_model.py
-|   |   |   |-- sentence_model.py
-|   |   |   |-- token_model.py
-|   |   |   |-- pattern_model.py
-|   |   |   `-- edit_model.py
-|   |   |-- schemas/
-|   |   |   |-- dataset_schema.py
-|   |   |   |-- token_schema.py
-|   |   |   |-- pattern_schema.py
-|   |   |   `-- edit_schema.py
-|   |   |-- routes/
-|   |   |   |-- upload_routes.py
-|   |   |   |-- sampling_routes.py
-|   |   |   |-- entity_routes.py
-|   |   |   `-- pattern_routes.py
-|   |   |-- services/
-|   |   |   |-- parser_service.py
-|   |   |   |-- sampling_service.py
-|   |   |   |-- entity_service.py
-|   |   |   `-- pattern_service.py
-|   |   |-- utils/
-|   |   |   |-- bio_validator.py
-|   |   |   |-- helpers.py
-|   |   |   `-- constants.py
-|   |   `-- core/
-|   |       `-- settings.py
-|   |-- requirements.txt
-|   `-- run.py
-|-- frontend/
-|   |-- app/
-|   |   |-- layout.js
-|   |   |-- page.js
-|   |   |-- globals.css
-|   |   |-- sampling/
-|   |   |   `-- page.jsx
-|   |   |-- entity/
-|   |   |   `-- page.jsx
-|   |   |-- patterns/
-|   |   |   `-- page.jsx
-|   |   `-- api/
-|   |       |-- upload/route.js
-|   |       |-- preview/route.js
-|   |       |-- sample/route.js
-|   |       |-- update/route.js
-|   |       |-- entity/route.js
-|   |       |-- entity/update/route.js
-|   |       |-- patterns/errors/route.js
-|   |       |-- patterns/fix/route.js
-|   |       `-- export/route.js
-|   |-- components/
-|   |   |-- Common/
-|   |   |   `-- TagDropdown.jsx
-|   |   |-- Sampling/
-|   |   |   |-- SampleControls.jsx
-|   |   |   |-- SampleList.jsx
-|   |   |   |-- TokenCard.jsx
-|   |   |   `-- ContextViewer.jsx
-|   |   |-- Entity/
-|   |   |   `-- BulkEditModal.jsx
-|   |   `-- Patterns/
-|   |       |-- PatternList.jsx
-|   |       `-- PatternCard.jsx
-|   |-- lib/
-|   |   |-- api.js
-|   |   `-- proxy.js
-|   |-- .env.example
-|   |-- package.json
-|   `-- next.config.js
-`-- README.md
-```
+Project progress fields:
+- total_tokens
+- verified_tokens
+- flagged_tokens
+- progress
 
-## Next Step
+## Backend API Highlights
 
-Add your backend and frontend implementation module-by-module in the scaffolded files.
+- Auth:
+	- POST /auth/signup
+	- POST /auth/login
+- Projects:
+	- POST /projects/create
+	- GET /projects?user_id=...
+	- GET /projects/{project_id}
+	- GET /projects/{project_id}/stats
+- Verification Sampling:
+	- GET /sample?project_id=...&size=...
+	- POST /sample/correct
+	- POST /sample/wrong
+	- POST /sample/flag
+- Preview and Export:
+	- GET /preview?project_id=...&limit=...
+	- GET /export?project_id=...
+
+## Run
+
+Backend:
+- cd backend
+- fastapi dev app/main.py
+
+Frontend:
+- cd frontend
+- npm install
+- npm run dev

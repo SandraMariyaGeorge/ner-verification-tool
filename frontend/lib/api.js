@@ -49,6 +49,36 @@ export async function getSample(size = 100, projectId) {
   return parseResponse(res);
 }
 
+export async function markSampleCorrect(tokenIds, projectId, verifiedBy = null, updates = []) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/sample/correct", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ project_id: pid, verified_by: verifiedBy, token_ids: tokenIds, updates })
+  });
+  return parseResponse(res);
+}
+
+export async function markSampleWrong(updates, projectId, verifiedBy = null) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/sample/wrong", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ project_id: pid, verified_by: verifiedBy, updates })
+  });
+  return parseResponse(res);
+}
+
+export async function markSampleFlag(tokenIds, projectId, verifiedBy = null) {
+  const pid = withProjectId(projectId);
+  const res = await fetch("/api/sample/flag", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ project_id: pid, verified_by: verifiedBy, token_ids: tokenIds })
+  });
+  return parseResponse(res);
+}
+
 export async function updateSingleTag(token, newTag, projectId) {
   const pid = withProjectId(projectId);
   const res = await fetch("/api/update", {
@@ -152,6 +182,15 @@ export async function listProjects(userId) {
 
 export async function getProject(projectId) {
   const res = await fetch(`/api/projects/${encodeURIComponent(projectId)}`, {
+    method: "GET",
+    cache: "no-store"
+  });
+  return parseResponse(res);
+}
+
+export async function getProjectStats(projectId) {
+  const pid = withProjectId(projectId);
+  const res = await fetch(`/api/projects/${encodeURIComponent(pid)}/stats`, {
     method: "GET",
     cache: "no-store"
   });

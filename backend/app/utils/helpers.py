@@ -17,12 +17,16 @@ def serialize_token(doc: dict) -> dict:
 		"original_tag": doc.get("original_tag"),
 		"entity_type": doc.get("entity_type"),
 		"tag_prefix": doc.get("tag_prefix"),
+		"verification_status": doc.get("verification_status", "unverified"),
+		"verified_by": doc.get("verified_by"),
+		"verified_at": doc.get("verified_at"),
 		"is_modified": doc.get("is_modified", False),
 	}
 
 
 def serialize_context(doc: dict) -> dict:
 	return {
+		"id": _stringify(doc.get("_id")),
 		"position": doc.get("position"),
 		"word": doc.get("word"),
 		"tag": doc.get("tag"),

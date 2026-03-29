@@ -5,6 +5,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from app.config.db import projects_col
 from app.schemas.dataset_schema import UploadResponse
 from app.services.parser_service import parse_and_store
+from app.services.project_service import sync_project_stats
 
 
 router = APIRouter(tags=["upload"])
@@ -32,11 +33,16 @@ async def upload_dataset(project_id: str = Form(...), file: UploadFile = File(..
 				"file_name": file.filename,
 				"total_tokens": stats["token_count"],
 				"total_sentences": stats["sentence_count"],
+				"verified_tokens": 0,
+				"flagged_tokens": 0,
+				"progress": 0.0,
 				"status": "processed",
 				"updated_at": now,
 			}
 		},
 	)
+
+	sync_project_stats(project_id)
 
 	return UploadResponse(
 		project_id=stats["project_id"],

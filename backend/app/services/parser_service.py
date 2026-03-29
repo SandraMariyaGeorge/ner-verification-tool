@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from app.config.db import patterns_col, sentences_col, tokens_col
+from app.config.db import patterns_col, samples_col, sentences_col, tokens_col
 from app.utils.bio_validator import split_tag
 
 
@@ -8,6 +8,7 @@ def parse_and_store(lines: Iterable[str], project_id: str) -> dict:
 	tokens_col.delete_many({"project_id": project_id})
 	sentences_col.delete_many({"project_id": project_id})
 	patterns_col.delete_many({"project_id": project_id})
+	samples_col.delete_many({"project_id": project_id})
 
 	token_docs: list[dict] = []
 	sentence_docs: list[dict] = []
@@ -62,6 +63,9 @@ def parse_and_store(lines: Iterable[str], project_id: str) -> dict:
 				"original_tag": tag,
 				"entity_type": entity,
 				"tag_prefix": prefix,
+				"verification_status": "unverified",
+				"verified_by": None,
+				"verified_at": None,
 				"is_modified": False,
 			}
 		)

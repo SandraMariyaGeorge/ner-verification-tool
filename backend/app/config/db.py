@@ -18,6 +18,7 @@ projects_col = db["projects"]
 tokens_col = db["tokens"]
 sentences_col = db["sentences"]
 patterns_col = db["patterns"]
+samples_col = db["samples"]
 
 
 def ensure_indexes() -> None:
@@ -26,6 +27,7 @@ def ensure_indexes() -> None:
 	projects_col.create_index([("user_id", ASCENDING)])
 
 	tokens_col.create_index([("project_id", ASCENDING)])
+	tokens_col.create_index([("project_id", ASCENDING), ("verification_status", ASCENDING)])
 	tokens_col.create_index([("word", ASCENDING)])
 	tokens_col.create_index([("sentence_id", ASCENDING), ("position", ASCENDING)])
 	tokens_col.create_index([("project_id", ASCENDING), ("sentence_index", ASCENDING), ("position", ASCENDING)])
@@ -34,3 +36,5 @@ def ensure_indexes() -> None:
 
 	patterns_col.create_index([("project_id", ASCENDING), ("status", ASCENDING)])
 	patterns_col.create_index([("sentence_id", ASCENDING), ("left_position", ASCENDING)])
+
+	samples_col.create_index([("project_id", ASCENDING), ("created_at", ASCENDING)])

@@ -22,9 +22,6 @@ Thumbs.db
 !backend/.env.example
 !frontend/.env.example
 
-# ----------------------------
-# Python backend
-# ----------------------------
 __pycache__/
 *.py[cod]
 *$py.class
@@ -40,10 +37,6 @@ build/
 .venv/
 venv/
 env/
-
-# ----------------------------
-# Node / Next.js frontend
-# ----------------------------
 node_modules/
 frontend/node_modules/
 frontend/.next/

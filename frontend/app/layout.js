@@ -1,5 +1,4 @@
 ﻿import "./globals.css";
-import Link from "next/link";
 
 export const metadata = {
   title: "Multi-user NER Verification Platform",
@@ -13,11 +12,6 @@ export default function RootLayout({ children }) {
         <div className="container">
           <h1 className="page-title">Malayalam NER Verification Tool</h1>
           <p className="page-subtitle">Multi-user, project-based sampling verification and correction workspace</p>
-          <nav className="nav">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/login">Login</Link>
-            <Link href="/signup">Signup</Link>
-          </nav>
           {children}
         </div>
       </body>

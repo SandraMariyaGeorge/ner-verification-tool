@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.config.db import projects_col
 from app.schemas.project_schema import CreateProjectRequest
+from app.services.project_service import get_project_stats
 
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -19,6 +20,10 @@ def create_project(payload: CreateProjectRequest) -> dict:
 		"name": payload.name,
 		"file_name": payload.file_name,
 		"total_tokens": 0,
+		"verified_tokens": 0,
+		"flagged_tokens": 0,
+		"edited_tokens": 0,
+		"progress": 0.0,
 		"total_sentences": 0,
 		"status": "created",
 		"created_at": now,
@@ -46,3 +51,11 @@ def get_project(project_id: str) -> dict:
 		raise HTTPException(status_code=404, detail="Project not found")
 	project["id"] = project.pop("_id")
 	return project
+
+
+@router.get("/{project_id}/stats")
+def project_stats(project_id: str) -> dict:
+	project = projects_col.find_one({"_id": project_id}, {"_id": 1})
+	if not project:
+		raise HTTPException(status_code=404, detail="Project not found")
+	return get_project_stats(project_id)
